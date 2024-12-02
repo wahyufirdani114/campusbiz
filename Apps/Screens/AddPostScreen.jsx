@@ -87,6 +87,14 @@ export default function AddPostScreen() {
                     onChangeText={handleChange('NoTel')}
                     
                   />
+                  <TextInput
+                    style={styles.input}
+                    placeholder='No. Telepon'
+                    value={values?.NoTel}
+                    keyboardType='number-pad'
+                    onChangeText={handleChange('NoTel')}
+                    
+                  />
 
                 {/* CAtegory list */}
                 <Picker
