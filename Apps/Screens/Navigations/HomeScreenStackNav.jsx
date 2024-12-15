@@ -3,7 +3,7 @@ import { createStackNavigator } from '@react-navigation/stack';
 import HomeScreen from '../HomeScreen';
 import ProductDetail from '../ProductDetail'; // Pastikan sudah diimport
 import ItemList2 from '../ItemList2';
-import { Ionicons } from '@expo/vector-icons'; // Pastikan Ionicons terinstall
+import { Ionicons } from '@expo/vector-icons'; // Pastikan Ionicons terinstal
 
 const Stack = createStackNavigator();
 
@@ -14,44 +14,62 @@ export default function HomeScreenStackNav() {
       <Stack.Screen
         name="home"
         component={HomeScreen}
-        options={{ headerShown: false }}
+        options={{ headerShown: false }} // Header disembunyikan di Home
       />
+
       {/* Screen untuk Item List */}
       <Stack.Screen
         name="item-List"
         component={ItemList2}
-        options={({ route }) => ({
-          title: route.params?.category || 'Items', // Judul dinamis berdasarkan kategori
+        options={({ route, navigation }) => ({
+          title: route.params?.category || 'Items', // Judul dinamis
           headerStyle: {
-            backgroundColor: '#fff', // Background header
-            height: 60, // Tinggi header untuk memberi proporsi yang baik
+            backgroundColor: '#fff',
+            height: 60, // Tinggi header
           },
           headerTitleStyle: {
-            fontSize: 18, // Ukuran font judul
+            fontSize: 18,
             fontWeight: 'bold',
-            textAlign: 'center',
-            marginTop: -2
           },
-          headerTitleAlign: 'center', // Pastikan judul di tengah
+          headerTitleAlign: 'center', // Judul di tengah
           headerBackTitleVisible: false, // Hilangkan teks "Back" bawaan
-          headerBackImage: () => (
+          headerLeft: () => (
             <Ionicons
-              name="arrow-back" // Icon Back
+              name="arrow-back"
               size={24}
               color="#000"
-              style={{
-                marginLeft: 9,
-                marginTop: -25 // Beri jarak dari tepi kiri
-              }}
+              onPress={() => navigation.goBack()} // Fungsi untuk kembali ke layar sebelumnya
+              style={{ marginLeft: 15 }} // Memberi jarak dari tepi kiri
             />
           ),
         })}
       />
+
       {/* Screen untuk Product Detail */}
       <Stack.Screen
         name="product-detail"
-        component={ProductDetail} // Pastikan Anda sudah mengimpor ProductDetail
-        options={{ title: 'Product Detail' }} // Opsi judul screen
+        component={ProductDetail}
+        options={({ navigation }) => ({
+          title: 'Product Detail',
+          headerStyle: {
+            backgroundColor: '#fff',
+            height: 60,
+          },
+          headerTitleStyle: {
+            fontSize: 18,
+            fontWeight: 'bold',
+          },
+          headerTitleAlign: 'center',
+          headerLeft: () => (
+            <Ionicons
+              name="arrow-back"
+              size={24}
+              color="#000"
+              onPress={() => navigation.goBack()} // Kembali ke layar sebelumnya
+              style={{ marginLeft: 15 }}
+            />
+          ),
+        })}
       />
     </Stack.Navigator>
   );

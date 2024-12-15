@@ -1,5 +1,5 @@
 import { View, Text, ActivityIndicator, FlatList, TouchableOpacity, Image } from 'react-native';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react'; // Mengimpor hooks untuk state dan efek
 import tw from 'twrnc';
 import { app } from '../../firebaseConfig';
 import { getFirestore, getDocs, orderBy, collection, query } from 'firebase/firestore';
@@ -7,37 +7,37 @@ import { useNavigation } from '@react-navigation/native';
 
 export default function ExploreScreen() {
   const db = getFirestore(app);
-  const [productList, setProductList] = useState([]); // State to store products
-  const [loading, setLoading] = useState(true); // State to handle loading indicator
-  const navigation = useNavigation(); // Access navigation object
+  const [productList, setProductList] = useState([]); // Menggunakan state immutable
+  const [loading, setLoading] = useState(true); // Menggunakan state immutable untuk loading indicator
+  const navigation = useNavigation(); // Fungsi sebagai first-class object untuk navigasi
 
   useEffect(() => {
-    getAllProducts();
+    getAllProducts(); // Memanggil fungsi murni tanpa efek samping
   }, []);
 
   const getAllProducts = async () => {
     try {
-      setLoading(true); // Show loading indicator while fetching data
-      const q = query(collection(db, 'Posts'), orderBy('createdAt', 'desc'));
+      setLoading(true); // State dikelola secara terpisah, tidak mengubah variabel global
+      const q = query(collection(db, 'Posts'), orderBy('createdAt', 'desc')); // Query bersifat deklaratif
       const snapshot = await getDocs(q);
 
       if (!snapshot.empty) {
-        const products = snapshot.docs.map(doc => doc.data());
-        setProductList(products); // Update state with fetched products
+        const products = snapshot.docs.map(doc => doc.data()); // Menggunakan map, contoh gaya deklaratif
+        setProductList(products); // Mengelola state immutable dengan data baru
       } else {
         console.log('No products found');
-        setProductList([]); // Set empty array if no products
+        setProductList([]); // Tidak memodifikasi state secara langsung
       }
     } catch (error) {
       console.error('Error fetching data:', error);
     } finally {
-      setLoading(false); // Hide loading indicator after fetching data
+      setLoading(false); // Mengatur ulang state loading tanpa efek samping
     }
   };
 
   const handleProductPress = (product) => {
-    // Navigate to the ProductDetail screen with product details
-    navigation.push('product-detail', { product }); // Make sure 'product-detail' is correctly defined in your stack
+    // Fungsi sebagai first-class object: dapat diteruskan sebagai props
+    navigation.push('product-detail', { product }); // Deklaratif: mendeskripsikan navigasi
   };
 
   return (
@@ -47,9 +47,9 @@ export default function ExploreScreen() {
       ) : (
         <FlatList
           data={productList}
-          keyExtractor={(item, index) => index.toString()}
-          numColumns={2} // Menampilkan 2 produk per baris
-          columnWrapperStyle={tw`justify-between px-4`} // Jarak antar kolom
+          keyExtractor={(item, index) => index.toString()} // Deklaratif: mendeskripsikan bagaimana kunci dibuat
+          numColumns={2} // Deklaratif: mendefinisikan jumlah kolom
+          columnWrapperStyle={tw`justify-between px-4`} // Deklaratif: mendeskripsikan tata letak kolom
           ListHeaderComponent={
             <View style={tw`p-5 py-8`}>
               <Text style={tw`text-[30px] font-bold text-gray-700`}>Explore More</Text>
@@ -57,12 +57,12 @@ export default function ExploreScreen() {
           }
           renderItem={({ item }) => (
             <TouchableOpacity
-              style={tw`bg-white rounded-lg shadow-md p-3 mb-4 w-[48%]`} // Lebar 48% untuk grid 2 kolom
-              onPress={() => handleProductPress(item)}
+              style={tw`bg-white rounded-lg shadow-md p-3 mb-4 w-[48%]`} // Gaya deklaratif: mendefinisikan tampilan produk
+              onPress={() => handleProductPress(item)} // Fungsi navigasi sebagai first-class function
             >
               <Image
                 source={{ uri: item.image }}
-                style={tw`h-24 w-full rounded-md mb-3`} // Gambar lebih kecil
+                style={tw`h-24 w-full rounded-md mb-3`} // Deklaratif: mendeskripsikan bagaimana gambar ditampilkan
                 resizeMode="cover"
               />
               <Text style={tw`text-center text-sm font-semibold mb-1 text-gray-700`}>

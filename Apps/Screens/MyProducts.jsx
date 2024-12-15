@@ -4,7 +4,7 @@ import { app } from '../../firebaseConfig';
 import { useUser } from '@clerk/clerk-expo';
 import { collection, getFirestore, query, where, getDocs } from 'firebase/firestore';
 import LatestItemList from './Components/HomeScreen/LatestItemList';
-import tw from 'twrnc'; // Pastikan Tailwind terkonfigurasi dengan benar
+import tw from 'twrnc'; 
 
 export default function MyProducts() {
     const db = getFirestore(app); // Inisialisasi Firestore

@@ -1,18 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import {
-  View,
-  Text,
-  TextInput,
-  TouchableOpacity,
-  Image,
-  ToastAndroid,
-  Modal,
-  SafeAreaView,
-  StyleSheet,
-  KeyboardAvoidingView,
-  ScrollView,
-  Platform,
-  ActivityIndicator,
+  View,Text,TextInput,TouchableOpacity,Image,ToastAndroid,Modal,SafeAreaView,StyleSheet,KeyboardAvoidingView,ScrollView,Platform,ActivityIndicator,
 } from 'react-native';
 import { getFirestore, getDocs, collection, addDoc } from 'firebase/firestore';
 import { app } from '../../firebaseConfig';
@@ -24,17 +12,18 @@ import { StatusBar } from 'expo-status-bar';
 import { useUser } from '@clerk/clerk-react';
 
 export default function AddPostScreen() {
-  const [image, setImage] = useState(null);
-  const [categoryList, setCategoryList] = useState([]);
-  const [isModalVisible, setIsModalVisible] = useState(false);
-  const [isLoading, setIsLoading] = useState(false); // Untuk loading saat submit
-  const { user } = useUser();
+  const [image, setImage] = useState(null); // State immutable untuk mengelola data gambar
+  const [categoryList, setCategoryList] = useState([]); // State immutable untuk kategori
+  const [isModalVisible, setIsModalVisible] = useState(false); // State immutable untuk modal
+  const [isLoading, setIsLoading] = useState(false); // State immutable untuk loading
+  const { user } = useUser(); // Menggunakan state dengan hook context (FP)
   const db = getFirestore(app);
 
   useEffect(() => {
-    getCategoryList();
+    getCategoryList(); // Memanggil fungsi murni saat komponen pertama kali dirender
   }, []);
 
+  // Fungsi murni untuk memilih gambar menggunakan API ImagePicker
   const pickImage = async () => {
     const result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ImagePicker.MediaTypeOptions.Images,
@@ -44,10 +33,11 @@ export default function AddPostScreen() {
     });
 
     if (!result.canceled) {
-      setImage(result.assets[0].uri);
+      setImage(result.assets[0].uri); // Memperbarui state immutable
     }
   };
 
+  // Fungsi murni untuk mengunggah gambar ke Cloudinary
   const uploadImageToCloudinary = async (fileUri) => {
     try {
       const formData = new FormData();
@@ -73,13 +63,14 @@ export default function AddPostScreen() {
       }
 
       const data = await response.json();
-      return data.secure_url;
+      return data.secure_url; // Mengembalikan hasil, sesuai sifat fungsi murni
     } catch (error) {
       console.error('Error uploading image:', error);
       throw error;
     }
   };
 
+  // Fungsi murni untuk mendapatkan daftar kategori dari Firestore
   const getCategoryList = async () => {
     try {
       const querySnapshot = await getDocs(collection(db, 'Category'));
@@ -87,22 +78,23 @@ export default function AddPostScreen() {
         const data = doc.data();
         return {
           ...data,
-          icon: data.icon || data.Icon,
+          icon: data.icon || data.Icon, // Deklaratif: mapping properti
         };
       });
-      setCategoryList(categories);
+      setCategoryList(categories); // Memperbarui state immutable
     } catch (error) {
       console.error('Error fetching categories:', error);
     }
   };
 
+  // Fungsi deklaratif untuk menangani submit form
   const onSubmitMethod = async (values, { resetForm }) => {
     try {
-      setIsLoading(true); // Tampilkan loading
+      setIsLoading(true); // Memperbarui state immutable
       let imageUrl = null;
 
       if (image) {
-        imageUrl = await uploadImageToCloudinary(image);
+        imageUrl = await uploadImageToCloudinary(image); // Memanfaatkan fungsi murni
       }
 
       if (!imageUrl) {
@@ -110,26 +102,26 @@ export default function AddPostScreen() {
       }
 
       const postData = {
-        ...values,
-        userName: user.fullName,
-        userEmail: user.primaryEmailAddress.emailAddress,
-        userImage: user.imageUrl,
+        ...values, // Menggunakan spread operator untuk immutability
+        userName: user.fullName, // Data user dari hook
+        userEmail: user.primaryEmailAddress.emailAddress, // Deklaratif: mengambil nilai dari context
+        userImage: user.imageUrl, // Deklaratif: mengambil properti user
         image: imageUrl,
         createdAt: new Date().toISOString(),
       };
 
-      await addDoc(collection(db, 'Posts'), postData);
+      await addDoc(collection(db, 'Posts'), postData); // Fungsi murni untuk menambahkan dokumen
       ToastAndroid.show('Post berhasil ditambahkan!', ToastAndroid.SHORT);
 
-      // Reset form dan image
-      resetForm(); // Reset semua input Formik
-      setImage(null); // Reset gambar
-      setIsModalVisible(true); // Tampilkan modal berhasil
+      // Reset form dan state gambar
+      resetForm();
+      setImage(null);
+      setIsModalVisible(true); // Tampilkan modal sukses
     } catch (error) {
       console.error('Error submitting post:', error);
       ToastAndroid.show('Gagal membuat post', ToastAndroid.SHORT);
     } finally {
-      setIsLoading(false); // Sembunyikan loading
+      setIsLoading(false); // Menyembunyikan indikator loading
     }
   };
 
@@ -151,19 +143,19 @@ export default function AddPostScreen() {
               NoTel: '',
               category: '',
             }}
-            onSubmit={(values, formikHelpers) => onSubmitMethod(values, formikHelpers)}
+            onSubmit={(values, formikHelpers) => onSubmitMethod(values, formikHelpers)} // Fungsi sebagai first-class object
             validate={(values) => {
               const errors = {};
               if (!values.title) {
                 ToastAndroid.show('Title harus diisi', ToastAndroid.SHORT);
-                errors.title = 'Title is required';
+                errors.title = 'Title is required'; // Validasi deklaratif
               }
               return errors;
             }}
           >
             {({ handleChange, handleBlur, handleSubmit, values, setFieldValue }) => (
               <View>
-                <TouchableOpacity onPress={pickImage}>
+                <TouchableOpacity onPress={pickImage}> // Menggunakan fungsi murni
                   {image ? (
                     <Image source={{ uri: image }} style={styles.imagePreview} />
                   ) : (
@@ -177,7 +169,7 @@ export default function AddPostScreen() {
                   style={styles.input}
                   placeholder="Title"
                   value={values.title}
-                  onChangeText={handleChange('title')}
+                  onChangeText={handleChange('title')} // FP: handler fungsi untuk state immutable
                 />
                 <TextInput
                   style={styles.input2}
@@ -203,11 +195,11 @@ export default function AddPostScreen() {
                 <View style={styles.pickerContainer}>
                   <Picker
                     selectedValue={values.category}
-                    onValueChange={(itemValue) => setFieldValue('category', itemValue)}
+                    onValueChange={(itemValue) => setFieldValue('category', itemValue)} // State dikelola secara deklaratif
                   >
                     <Picker.Item label="Select Category" value="" />
                     {categoryList.map((item, index) => (
-                      <Picker.Item key={index} label={item.name} value={item.name} />
+                      <Picker.Item key={index} label={item.name} value={item.name} /> // Iterasi deklaratif
                     ))}
                   </Picker>
                 </View>

@@ -5,7 +5,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { useUser } from '@clerk/clerk-expo';
 import { deleteDoc, query, getDocs, where, collection, doc } from 'firebase/firestore';
 import { getFirestore } from 'firebase/firestore';
-import { app } from '../../firebaseConfig'; // Pastikan import firebaseConfig sesuai
+import { app } from '../../firebaseConfig';
 
 import tw from 'twrnc';
 
@@ -118,14 +118,14 @@ export default function ProductDetail() {
                     {product?.title || 'Produk Tidak Ditemukan'}
                 </Text>
                 {product?.category && (
-                <Text
-                    style={[
-                    tw`mt-2 px-2 rounded-full bg-blue-200 text-blue-500`,
-                    { maxWidth: '80%', alignSelf: 'flex-start', paddingVertical: 5 }
-                    ]}
-                >
-                    {product.category}
-                </Text>
+                    <Text
+                        style={[
+                            tw`mt-2 px-2 rounded-full bg-blue-200 text-blue-500`,
+                            { maxWidth: '80%', alignSelf: 'flex-start', paddingVertical: 5 }
+                        ]}
+                    >
+                        {product.category}
+                    </Text>
                 )}
 
                 <Text style={tw`mt-2 font-bold text-[20px]`}>Deskripsi</Text>
